@@ -12,7 +12,7 @@ display(df)
 
 # COMMAND ----------
 
-# MAGIC %fs ls /Users/christopher.chalcraft@databricks.com
+# MAGIC %fs ls /Users/christopher.chalcraft@databricks.com/field_demos/dltpoc/tables
 
 # COMMAND ----------
 
@@ -20,4 +20,8 @@ display(df)
 
 # COMMAND ----------
 
+# MAGIC %run ../../_resources/setup
 
+# COMMAND ----------
+
+df.write.format("delta").option("path", f"{cloud_storage_path}/tables").saveAsTable("farmers_market")

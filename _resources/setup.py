@@ -1,15 +1,4 @@
 # Databricks notebook source
-# MAGIC %md 
-# MAGIC # Set up configuration
-# MAGIC ## Libraries
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Path and database configuration
-
-# COMMAND ----------
-
 # dbutils.widgets.removeAll()
 
 # COMMAND ----------
@@ -72,4 +61,5 @@ if reset_all:
 spark.sql(f"""create database if not exists {dbName} LOCATION '{cloud_storage_path}/tables' """)
 spark.sql(f"""USE {dbName}""")
 
+print(f"using database {dbName}")
 print("using cloud_storage_path {}".format(cloud_storage_path))
