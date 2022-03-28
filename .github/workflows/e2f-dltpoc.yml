@@ -51,8 +51,13 @@ jobs:
           #        run: |
           #          databricks jobs configure --version=2.1
 
+          #      - 
+          #        name: copy notebooks
+          #        run: |
+          #          databricks workspace mkdirs "/Users/$USER/techval/dlt/"
+          #          databricks workspace import_dir -o -e ./product/delta_live_tables /Users/christopher.chalcraft@databricks.com/techval --profile DEFAULT
+
       - 
-        name: copy notebooks
+        name: test
         run: |
-          databricks workspace mkdirs "/Users/$USER/techval/dlt/"
-          databricks workspace import_dir -o -e ./product/delta_live_tables /Users/christopher.chalcraft@databricks.com/techval --profile DEFAULT
+          databricks jobs list
