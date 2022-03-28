@@ -9,7 +9,7 @@ def get_rules(tag):
     :return: dictionary of rules that matched the tag
   """
   rules = {}
-  df = spark.read.format("csv").option("header", "true").load("rules.csv")
+  df = spark.read.format("csv").option("header", "true").load("/FileStore/tables/christopher_chalcraft/rules.csv")
   for row in df.filter(col("tag") == tag).collect():
     rules[row['name']] = row['constraint']
   return rules
