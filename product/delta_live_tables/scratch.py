@@ -24,4 +24,4 @@ display(df)
 
 # COMMAND ----------
 
-df.write.format("delta").option("path", f"{cloud_storage_path}/tables").saveAsTable("farmers_market")
+df.write.format("delta").mode("overwrite").option("path", f"{cloud_storage_path}/tables").saveAsTable("farmers_market")
