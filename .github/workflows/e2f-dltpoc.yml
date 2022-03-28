@@ -55,4 +55,4 @@ jobs:
         name: copy notebooks
         run: |
           databricks workspace mkdirs "/Users/$USER/techval/dlt/"
-          databricks workspace import_dir -o -e ./product/delta_live_tables /Users/$USER/techval --profile DEFAULT
+          databricks workspace import_dir -o -e ./product/delta_live_tables /Users/christopher.chalcraft@databricks.com/techval --profile DEFAULT
