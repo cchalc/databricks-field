@@ -1,0 +1,21 @@
+{
+    "id": "fcd94271-f208-4e16-ad89-15d5189b2b0d",
+    "clusters": [
+        {
+            "label": "default",
+            "num_workers": 2
+        }
+    ],
+    "development": true,
+    "continuous": false,
+    "libraries": [
+        {
+            "notebook": {
+                "path": "/Repos/christopher.chalcraft@databricks.com/databricks-field/product/delta_live_tables/dlt_expect"
+            }
+        }
+    ],
+    "name": "dlt-expectations",
+    "storage": "dbfs:/pipelines/fcd94271-f208-4e16-ad89-15d5189b2b0d",
+    "target": "christopher_chalcraft_dltpoc"
+}
