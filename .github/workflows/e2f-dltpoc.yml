@@ -46,10 +46,10 @@ jobs:
           echo "host = $DATABRICKS_HOST" > ~/.databrickscfg
           echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
 
-      - 
-        name: update jobs api to version 2.1
-        run: |
-          databricks jobs configure --version=2.1
+          #      - 
+          #        name: update jobs api to version 2.1
+          #        run: |
+          #          databricks jobs configure --version=2.1
 
       - 
         name: copy notebooks
