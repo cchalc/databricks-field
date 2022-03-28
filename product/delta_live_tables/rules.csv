@@ -1,4 +1,4 @@
-name, constraint, tag
+name,constraint,tag
 website_not_null,"Website IS NOT NULL",validity
 location_not_null,"Location IS NOT NULL",validity
 state_not_null,"State IS NOT NULL",validity
