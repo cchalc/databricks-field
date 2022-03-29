@@ -1,0 +1,21 @@
+{
+    "id": "30753bca-eea1-4b9b-a888-304177ea5d95",
+    "clusters": [
+        {
+            "label": "default",
+            "num_workers": 2
+        }
+    ],
+    "development": true,
+    "continuous": false,
+    "libraries": [
+        {
+            "notebook": {
+                "path": "/Repos/christopher.chalcraft@databricks.com/databricks-field/product/delta_live_tables/metaprogramming"
+            }
+        }
+    ],
+    "name": "cchalc-fire-department",
+    "storage": "dbfs:/pipelines/30753bca-eea1-4b9b-a888-304177ea5d95",
+    "target": "christopher_chalcraft_dltpoc"
+}
