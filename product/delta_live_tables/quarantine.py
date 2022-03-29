@@ -12,14 +12,15 @@ rules["valid_location"] = "(Location IS NOT NULL)"
 # concatenate inverse rules
 quarantine_rules["invalid_record"] = "NOT({0})".format(" AND ".join(rules.values()))
 
-@dlt.table(
-  name="raw_farmers_market"
-)
-def get_farmers_market_data():
-  return (
-    spark.read.format('csv').option("header", "true")
-      .load('/databricks-datasets/data.gov/farmers_markets_geographic_data/data-001/')
-  )
+# This is in the expect notebook
+# @dlt.table(
+#   name="raw_farmers_market"
+# )
+# def get_farmers_market_data():
+#   return (
+#     spark.read.format('csv').option("header", "true")
+#       .load('/databricks-datasets/data.gov/farmers_markets_geographic_data/data-001/')
+#   )
 
 @dlt.table(
   name="valid_farmers_market"
