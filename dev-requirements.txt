@@ -1,3 +1,5 @@
-databricks-cli>=0.15.0
 dbx
+databricks-cli>=0.15.0
+databricks-sql-cli
+databricks-connect==10.4.*
 nutter
