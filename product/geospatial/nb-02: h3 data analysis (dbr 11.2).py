@@ -31,7 +31,7 @@ from pyspark.databricks.sql.functions import *
 # COMMAND ----------
 
 # MAGIC %sql -- DATABASE FROM NB-01
-# MAGIC use h3_prod_api;
+# MAGIC use cjc_h3_prod_api;
 # MAGIC show tables;
 
 # COMMAND ----------

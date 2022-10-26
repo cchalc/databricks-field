@@ -32,8 +32,8 @@ import com.databricks.sql.functions._
 
 // COMMAND ----------
 
-// MAGIC %sql CREATE DATABASE IF NOT EXISTS h3_prod_api;
-// MAGIC USE h3_prod_api;
+// MAGIC %sql CREATE DATABASE IF NOT EXISTS cjc_h3_prod_api;
+// MAGIC USE cjc_h3_prod_api;
 
 // COMMAND ----------
 
