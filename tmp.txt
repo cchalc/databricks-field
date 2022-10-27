@@ -1,0 +1,261 @@
+zone
+Midtown Center
+Queens Village
+Marine Park/Floyd Bennett Field
+Sunset Park West
+Times Sq/Theatre District
+West Brighton
+Bensonhurst West
+Broad Channel
+Clinton East
+Flatbush/Ditmas Park
+Great Kills Park
+Queensboro Hill
+Seaport
+Bronx Park
+Park Slope
+Prospect-Lefferts Gardens
+Soundview/Castle Hill
+South Beach/Dongan Hills
+Willets Point
+World Trade Center
+City Island
+East Flatbush/Remsen Village
+Red Hook
+Sunnyside
+Williamsbridge/Olinville
+Astoria Park
+East Harlem South
+Flatlands
+Alphabet City
+Long Island City/Hunters Point
+Longwood
+Richmond Hill
+TriBeCa/Civic Center
+Borough Park
+Homecrest
+Midtown North
+Washington Heights South
+Flushing
+Jamaica Estates
+Steinway
+Murray Hill-Queens
+Upper East Side South
+East Chelsea
+Gramercy
+Inwood Hill Park
+Ridgewood
+Saint George/New Brighton
+Claremont/Bathgate
+Kingsbridge Heights
+Saint Michaels Cemetery/Woodside
+South Ozone Park
+Bayside
+East Elmhurst
+Prospect Heights
+Sunset Park East
+Breezy Point/Fort Tilden/Riis Beach
+Crown Heights North
+East Flatbush/Farragut
+Gowanus
+Hillcrest/Pomonok
+Brooklyn Navy Yard
+Bushwick North
+Forest Park/Highland Park
+Marble Hill
+Meatpacking/West Village West
+Pelham Bay Park
+Van Cortlandt Park
+Bay Terrace/Fort Totten
+Murray Hill
+Williamsburg (North Side)
+Williamsburg (South Side)
+Chinatown
+Corona
+East New York
+Cypress Hills
+Sutton Place/Turtle Bay North
+Bloomingdale
+Glendale
+Great Kills
+Hamilton Heights
+Penn Station/Madison Sq West
+Sheepshead Bay
+Woodhaven
+Windsor Terrace
+Westchester Village/Unionport
+Brooklyn Heights
+Midtown East
+Cobble Hill
+Crotona Park East
+Howard Beach
+Midwood
+Old Astoria
+Auburndale
+East Concourse/Concourse Village
+East Village
+Fresh Meadows
+Manhattan Beach
+Lincoln Square West
+Crotona Park
+Rego Park
+Roosevelt Island
+Stuy Town/Peter Cooper Village
+Coney Island
+Eastchester
+Flushing Meadows-Corona Park
+Stapleton
+Bushwick South
+Columbia Street
+Financial District North
+Upper East Side North
+Manhattan Valley
+Briarwood/Jamaica Hills
+East New York/Pennsylvania Avenue
+Grymes Hill/Clifton
+Lenox Hill West
+SoHo
+Woodside
+Newark Airport
+Bronxdale
+Charleston/Tottenville
+Inwood
+Morningside Heights
+Carroll Gardens
+College Point
+Flatiron
+JFK Airport
+Melrose South
+Soundview/Bruckner
+Bensonhurst East
+East Harlem North
+Elmhurst
+Fort Greene
+Manhattanville
+Ocean Parkway South
+Canarsie
+East Flushing
+Hudson Sq
+Freshkills Park
+Whitestone
+Rosedale
+Union Sq
+East Williamsburg
+Gravesend
+West Village
+North Corona
+Prospect Park
+Starrett City
+Bath Beach
+Brighton Beach
+Rikers Island
+Erasmus
+Far Rockaway
+Elmhurst/Maspeth
+Financial District South
+LaGuardia Airport
+Lower East Side
+Middle Village
+Rockaway Park
+Kew Gardens
+Little Italy/NoLiTa
+Ocean Hill
+Van Nest/Morris Park
+Central Harlem North
+Highbridge
+Jamaica
+New Dorp/Midland Beach
+Stuyvesant Heights
+Eltingville/Annadale/Prince's Bay
+Greenwich Village North
+Laurelton
+Morrisania/Melrose
+Battery Park
+Bedford Park
+Clinton West
+South Williamsburg
+Two Bridges/Seward Park
+Heartland Village/Todt Hill
+Riverdale/North Riverdale/Fieldston
+Forest Hills
+Hammels/Arverne
+Upper West Side North
+Westerleigh
+Bedford
+Pelham Bay
+Randalls Island
+Allerton/Pelham Gardens
+Country Club
+Douglaston
+Kensington
+Long Island City/Queens Plaza
+Port Richmond
+Upper West Side South
+Central Park
+Pelham Parkway
+Crown Heights South
+Highbridge Park
+Lincoln Square East
+Jamaica Bay
+Arden Heights
+Hunts Point
+Spuyten Duyvil/Kingsbridge
+West Chelsea/Hudson Yards
+Battery Park City
+Co-Op City
+Maspeth
+Norwood
+Greenwich Village South
+UN/Turtle Bay South
+Astoria
+Baisley Park
+Mariners Harbor
+Central Harlem
+Madison
+Jackson Heights
+Oakland Gardens
+Oakwood
+Bay Ridge
+Clinton Hill
+Mott Haven/Port Morris
+Rossville/Woodrow
+University Heights/Morris Heights
+Washington Heights North
+West Concourse
+Bellerose
+Cambria Heights
+Fordham South
+Kips Bay
+Marine Park/Mill Basin
+Schuylerville/Edgewater Park
+Woodlawn/Wakefield
+Downtown Brooklyn/MetroTech
+Glen Oaks
+Governor's Island/Ellis Island/Liberty Island
+Lenox Hill East
+Ozone Park
+Bloomfield/Emerson Hill
+Brownsville
+DUMBO/Vinegar Hill
+Van Cortlandt Village
+Dyker Heights
+Kew Gardens Hills
+Parkchester
+West Farms/Bronx River
+Belmont
+East Tremont
+Garment District
+Green-Wood Cemetery
+Hollis
+Saint Albans
+South Jamaica
+Springfield Gardens North
+Boerum Hill
+Greenpoint
+Midtown South
+Mount Hope
+Queensbridge/Ravenswood
+Yorkville West
+Yorkville East
+Arrochar/Fort Wadsworth
+Springfield Gardens South
