@@ -1,15 +1,15 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Online Feature Store example notebook
-# MAGIC 
+# MAGIC
 # MAGIC This notebook illustrates the use of Databricks Feature Store to publish features to an online store for real-time 
 # MAGIC serving and automated feature lookup. The problem is to predict the wine quality using a ML model
 # MAGIC with a variety of static wine features and a realtime input. 
-# MAGIC 
+# MAGIC
 # MAGIC ![wine picture](https://archive.ics.uci.edu/ml/assets/MLimages/Large186.jpg)
-# MAGIC 
+# MAGIC
 # MAGIC This notebook creates an endpoint to predict the quality of a bottle of wine, given an ID and the realtime feature alcohol by volume (ABV).
-# MAGIC 
+# MAGIC
 # MAGIC The notebook is structured as follows:
 # MAGIC  
 # MAGIC 1. Prepare the feature table
@@ -19,13 +19,13 @@
 # MAGIC 4. Train and deploy the model
 # MAGIC 5. Serve realtime queries with automatic feature lookup
 # MAGIC 6. Clean up
-# MAGIC 
+# MAGIC
 # MAGIC ### Data Set
-# MAGIC 
+# MAGIC
 # MAGIC This example uses the [Wine Quality Data Set](https://archive.ics.uci.edu/ml/datasets/wine+quality).
-# MAGIC 
+# MAGIC
 # MAGIC ### Requirements
-# MAGIC 
+# MAGIC
 # MAGIC * Databricks Runtime 10.4 LTS for Machine Learning or above
 # MAGIC * Access to AWS DynamoDB
 # MAGIC     - This notebook uses DynamoDB as the online store and guides you through how to generate secrets and register them with Databricks
@@ -39,11 +39,11 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC ## Prepare the feature table
-# MAGIC 
+# MAGIC
 # MAGIC Suppose you need to build an endpoint to predict wine quality with just the `wine_id`. There has to be a feature table saved in Feature Store where the endpoint can look up features of the wine by the `wine_id`. For the purpose of this demo, we need to prepare this feature table ourselves first. The steps are:
-# MAGIC 
+# MAGIC
 # MAGIC 1. Load and clean the raw data.
 # MAGIC 2. Separate features and labels.
 # MAGIC 3. Save features into a feature table.
@@ -52,7 +52,7 @@
 
 # MAGIC %md
 # MAGIC ### Load and clean the raw data 
-# MAGIC 
+# MAGIC
 # MAGIC The raw data contains 12 columns including 11 features and the `quality` column. The `quality` column is an integer that ranges from 3 to 8. The goal is to build a model that predicts the `quality` value.
 
 # COMMAND ----------
@@ -71,7 +71,7 @@ raw_data_frame.toPandas().shape
 # MAGIC There are some problems with the raw data:
 # MAGIC 1. The column names contain space (' '), which is not compatible with Feature Store. 
 # MAGIC 2. We need to add ID to the raw data so they can be looked up later by Feature Store.
-# MAGIC 
+# MAGIC
 # MAGIC The following cell addresses these issues.
 
 # COMMAND ----------
@@ -105,7 +105,7 @@ display(id_and_data)
 
 # MAGIC %md
 # MAGIC Let's assume that the alcohol by volume (ABV) is a variable that changes over time after the wine is opened. The value will be provided as a realtime input in online inference. 
-# MAGIC 
+# MAGIC
 # MAGIC Now, split the data into two parts and store only the part with static features to Feature Store. 
 
 # COMMAND ----------
@@ -120,7 +120,7 @@ id_rt_feature_labels = id_and_data.select('wine_id', 'alcohol', 'quality')
 
 # MAGIC %md
 # MAGIC ### Create a feature table
-# MAGIC 
+# MAGIC
 # MAGIC Next, create a new hive database and save the feature data `id_static_features` into a feature table.
 
 # COMMAND ----------
@@ -153,30 +153,30 @@ fs.create_table(
 
 # MAGIC %md
 # MAGIC ## Set up DynamoDB Access Key
-# MAGIC 
+# MAGIC
 # MAGIC In this section, you need to take some manual steps to make DynamoDB accessible to this notebook. Databricks creates and updates DynamoDB tables so that DynamoDB can work with Feature Store. The following steps create a new AWS IAM user with the required permissions. You can also choose to use your existing users or roles.
-# MAGIC 
+# MAGIC
 # MAGIC ### Create an AWS IAM user and download secrets
 # MAGIC 1. Go to AWS console http://console.aws.amazon.com, navigate to IAM, and click "Users".
 # MAGIC 2. Click "Add users" and create a new user with "Access Key".
 # MAGIC 3. Click Next and select policy `AmazonDynamoDBFullAccess`.
 # MAGIC 4. Click Next until the user is created.
 # MAGIC 5. Download the "Access key ID" and "Secret access key".
-# MAGIC 
+# MAGIC
 # MAGIC ### Provide online store credentials using Databricks secrets
-# MAGIC 
+# MAGIC
 # MAGIC **Note:** For simplicity, the commands below use predefined names for the scope and secrets. To choose your own scope and secret names, follow the process in the Databricks documentation ([AWS](https://docs.databricks.com/applications/machine-learning/feature-store/online-feature-stores.html)|[Azure](https://docs.microsoft.com/azure/databricks/applications/machine-learning/feature-store/online-feature-stores)).
-# MAGIC 
+# MAGIC
 # MAGIC 1. Create two secret scopes in Databricks.
-# MAGIC 
+# MAGIC
 # MAGIC     ```
 # MAGIC     databricks secrets create-scope --scope feature-store-example-read
 # MAGIC     databricks secrets create-scope --scope feature-store-example-write
 # MAGIC     ```
-# MAGIC 
+# MAGIC
 # MAGIC 2. Create secrets in the scopes.  
 # MAGIC    **Note:** the keys should follow the format `<prefix>-access-key-id` and `<prefix>-secret-access-key` respectively. Again, for simplicity, these commands use predefined names here. When the commands run, you will be prompted to copy your secrets into an editor.
-# MAGIC 
+# MAGIC
 # MAGIC     ```
 # MAGIC     databricks secrets put --scope feature-store-example-read --key dynamo-access-key-id
 # MAGIC     databricks secrets put --scope feature-store-example-read --key dynamo-secret-access-key
@@ -191,7 +191,7 @@ fs.create_table(
 
 # MAGIC %md
 # MAGIC ## Publish the features to the online feature store
-# MAGIC 
+# MAGIC
 # MAGIC This allows Feature Store to add a lineage information about the feature table and the online storage. So when the model serves real-time queries, it can lookup features from the online store for better performance.
 
 # COMMAND ----------
@@ -215,7 +215,7 @@ fs.publish_table("online_feature_store_example.wine_static_features", online_sto
 
 # MAGIC %md
 # MAGIC ## Train and deploy the model
-# MAGIC 
+# MAGIC
 # MAGIC Now, you will train a classifier using features in the Feature Store. You only need to specify the primary key, and Feature Store will fetch the required features.
 
 # COMMAND ----------
@@ -285,9 +285,9 @@ fs.log_model(
 
 # MAGIC %md
 # MAGIC ## Serve realtime queries with automatic feature lookup
-# MAGIC 
+# MAGIC
 # MAGIC After calling `log_model`, a new version of the model is saved. To provision a serving endpoint, follow the steps below.
-# MAGIC 
+# MAGIC
 # MAGIC 1. Click **Models** in the left sidebar. If you don't see it, switch to the Machine Learning Persona ([AWS](https://docs.databricks.com/workspace/index.html#use-the-sidebar)|[Azure](https://docs.microsoft.com/azure/databricks//workspace/index#use-the-sidebar)).
 # MAGIC 2. Enable serving for the model named "wine_quality_classifier". See the Databricks documentation for details ([AWS](https://docs.databricks.com/applications/mlflow/model-serving.html#model-serving-from-model-registry)|[Azure](https://docs.microsoft.com/azure/databricks/applications/mlflow/model-serving#model-serving-from-model-registry)).
 
@@ -295,7 +295,7 @@ fs.log_model(
 
 # MAGIC %md
 # MAGIC ## Send a query
-# MAGIC 
+# MAGIC
 # MAGIC In the Serving page, there are three approaches for calling the model. You can try the "Browser" approach with a JSON format request, as shown below. But here we copy-pasted the Python approach to illustrate an programatic way.
 
 # COMMAND ----------
@@ -340,6 +340,7 @@ print(predict(new_wine_ids))
 
 # MAGIC %md
 # MAGIC ### Notes on request format and API versions
+# MAGIC
 
 # COMMAND ----------
 
@@ -351,7 +352,7 @@ print(predict(new_wine_ids))
 # MAGIC   {"wine_id": 25, "alcohol": 11.0}
 # MAGIC ]
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC With Databricks Model, the endpoint takes a different body format:
 # MAGIC ```
 # MAGIC {
@@ -361,16 +362,16 @@ print(predict(new_wine_ids))
 # MAGIC   ]
 # MAGIC }
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC Learn more about [Databricks Model Serving](https://docs.databricks.com/machine-learning/model-serving/migrate-model-serving.html)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Clean up
-# MAGIC 
+# MAGIC
 # MAGIC Follow this checklist to clean up the resources created by this notebook:
-# MAGIC 
+# MAGIC
 # MAGIC 1. AWS DynamoDB Table
 # MAGIC     * Go to AWS console and navigate to DynamoDB.
 # MAGIC     * Delete the table `feature_store_online_wine_features`

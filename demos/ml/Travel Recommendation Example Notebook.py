@@ -1,15 +1,15 @@
 # Databricks notebook source
 # MAGIC %md # Travel Recommendation Example Notebook
-# MAGIC 
+# MAGIC
 # MAGIC This notebook illustrates the use of different feature computation modes: Batch, Streaming and On-Demand. It has been shown that Machine learning models degrade in performance as the features become stale. This is true more so for certain type of features than others. If the data being generated updates quickly and factors heavily into the outcome of the model, it should be updated regularly. However, updating static data often would lead to increased costs with no perceived benefits. This notebook illustrates various feature computation modes available in Databricks using Databricks Feature Store based on the feature freshness requirements for a travel recommendation website. 
-# MAGIC 
+# MAGIC
 # MAGIC ![Feature Computation Options](files/shared_uploads/aakrati.talati@databricks.com/freshness.png)
 # MAGIC <img src="https://docs.databricks.com/_static/images/machine-learning/feature-store/realtime/freshness.png"/>
-# MAGIC 
+# MAGIC
 # MAGIC This notebook builds a ranking model to predict likelihood of a user purchasing a destination package.
-# MAGIC 
+# MAGIC
 # MAGIC The notebook is structured as follows:
-# MAGIC 
+# MAGIC
 # MAGIC 1. Explore the dataset
 # MAGIC 1. Compute the features in three computation modes
 # MAGIC    * Batch features
@@ -19,10 +19,11 @@
 # MAGIC 1. Train and deploy the model
 # MAGIC 1. Serve realtime queries with automatic feature lookup
 # MAGIC 1. Clean up
-# MAGIC 
+# MAGIC
 # MAGIC ### Requirements
 # MAGIC * Databricks Runtime 11.3 LTS for Machine Learning or above. 
 # MAGIC * Access to AWS DynamoDB. This notebook uses DynamoDB as the online store.
+# MAGIC
 
 # COMMAND ----------
 
@@ -31,9 +32,9 @@
 # COMMAND ----------
 
 # MAGIC %md ## Data Set
-# MAGIC 
+# MAGIC
 # MAGIC For the Travel recommendation model, we have different types of data available: 
-# MAGIC 
+# MAGIC
 # MAGIC * __Destination location__ data - is a static dataset of destinations for which my website serves vacation packages for. The destination location dataset consists of `latitude`, `longitude`, `name` and `price`. This dataset only changes when a new destination is added. The update frequency for this data is once a month and I compute these features in __batch-mode__. 
 # MAGIC * __Destination popularity__ data - My website gathers the popularity information from the website usage logs based on number of impressions (e.g. `mean_impressions`, `mean_clicks_7d`) and user activity on those impressions. I use __batch-mode__ since my data sees shifts in patterns over longer periods of time. 
 # MAGIC * __Destination availability__ data - Whenever a user books a room for the hotel, my destination availability and price (e.g. `destination_availability`, `destination_price`) gets affected. Because price and availability are a big driver for users booking vacation destinations, I want to keep this data fairly up-to-date, especially around holiday time. Batch-mode computation with hours of latency would not work, so I use spark structured streaming to update my data in __streaming-mode__.
@@ -85,7 +86,7 @@ def get_latest_model_version(model_name: str):
 # COMMAND ----------
 
 # MAGIC %md ## Compute Batch Features
-# MAGIC 
+# MAGIC
 # MAGIC Calculate the aggregated features from the vacation purchase logs for destination and users. The destination features include popularity features such as impressions and clicks and pricing features such as price at the time of booking. The user features capture the user profile information such as past purchased price. Because the booking data does not change very often, it can be computed once per day in batch.
 
 # COMMAND ----------
@@ -210,7 +211,7 @@ fs.create_table(
 # COMMAND ----------
 
 # MAGIC %md ## Compute Streaming Features
-# MAGIC 
+# MAGIC
 # MAGIC Availability of the destination can hugely affect the prices. Availability can change frequently especially around the holidays or long weekends during busy season. This data has a freshness requirement of every few minutes, so we use spark structured streaming to ensure data is fresh when doing model prediction. 
 
 # COMMAND ----------
@@ -267,7 +268,7 @@ fs.write_table(
 # COMMAND ----------
 
 # MAGIC %md ## Compute Realtime/On-Demand features
-# MAGIC 
+# MAGIC
 # MAGIC User location is a context feature that is captured at the time of the query. This data is not known in advance hence the derived feature i.e., user distance from destination can only be computed in realtime at the prediction time. MLflow pyfunc captures this feature transformation using a preprocessing code that manipulates the input data frame before passing to model at training and serving time. 
 
 # COMMAND ----------
@@ -339,7 +340,7 @@ class OnDemandComputationModelWrapper(mlflow.pyfunc.PythonModel):
 # COMMAND ----------
 
 # MAGIC %md # Train a custom model with batch + on-demand + streaming features
-# MAGIC 
+# MAGIC
 # MAGIC We will now use all the features created above to train a ranking model.
 
 # COMMAND ----------
@@ -506,7 +507,7 @@ print("Accuracy: ", accuracy_score(pd_scoring["purchased"], pd_scoring["predicti
 # COMMAND ----------
 
 # MAGIC %md # Publish feature tables to online store
-# MAGIC 
+# MAGIC
 # MAGIC In order to use the above models in a realtime scenario, we will publish the table to a online store. This will allow the model to serve prediction queries with low-latency.
 # MAGIC Follow the instructions in https://docs.databricks.com/machine-learning/feature-store/online-feature-stores.html#provide-online-store-credentials-using-databricks-secrets to store secrets in the Databricks secret manager with the below scope. 
 
@@ -571,9 +572,9 @@ fs.publish_table(f"travel_recommendations.availability_features",
 
 # MAGIC %md
 # MAGIC ### Enable model inferencevia API call
-# MAGIC 
+# MAGIC
 # MAGIC After calling `log_model`, a new version of the model is saved. To provision a serving endpoint, follow the steps below.
-# MAGIC 
+# MAGIC
 # MAGIC 1. Click **Models** in the left sidebar. If you don't see it, switch to the Machine Learning Persona ([AWS](https://docs.databricks.com/workspace/index.html#use-the-sidebar)|[Azure](https://docs.microsoft.com/azure/databricks//workspace/index#use-the-sidebar)).
 # MAGIC 2. Enable serving for the model named "realtime_destination_recommendations". See the Databricks documentation for details ([AWS](https://docs.databricks.com/applications/mlflow/model-serving.html#model-serving-from-model-registry)|[Azure](https://docs.microsoft.com/azure/databricks/applications/mlflow/model-serving#model-serving-from-model-registry)).
 
@@ -603,10 +604,10 @@ assert r.status_code == 200, f"Expected an HTTP 200 response, received {r.status
 
 # MAGIC %md 
 # MAGIC ## Send payloads via REST call
-# MAGIC 
+# MAGIC
 # MAGIC With Databricks Serverless Real-Time Inference, the endpoint takes a different body format:
 # MAGIC You can see the Users in New York, see high scores for Florida whereas Users in California, see high scores for Hawaii.
-# MAGIC 
+# MAGIC
 # MAGIC ```
 # MAGIC {
 # MAGIC   "dataframe_records": [
@@ -615,7 +616,7 @@ assert r.status_code == 200, f"Expected an HTTP 200 response, received {r.status
 # MAGIC   ]
 # MAGIC }
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC Databricks Serverless Real-Time Inference is in preview; to enroll, follow the instructions ([AWS](https://docs.databricks.com/applications/mlflow/migrate-and-enable-serverless-real-time-inference.html#enable-serverless-real-time-inference-for-your-workspace)|[Azure](https://docs.microsoft.com/azure/databricks/applications/mlflow/migrate-and-enable-serverless-real-time-inference#enable-serverless-real-time-inference-for-your-workspace)).
 
 # COMMAND ----------
@@ -652,7 +653,7 @@ print(score_model(payload_json))
 # COMMAND ----------
 
 # MAGIC %md ## Cleanup 
-# MAGIC 
+# MAGIC
 # MAGIC 1. Stop the serving endpoint by visiting models tab 
 # MAGIC 2. Cleanup secrets in Databricks secret manager and the online feature table 
 # MAGIC 3. Stop the streaming writes to feature table and online store
