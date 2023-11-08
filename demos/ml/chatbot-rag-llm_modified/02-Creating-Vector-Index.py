@@ -39,7 +39,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./_resources/00-init $catalog=dbdemos $db=chatbot $reset_all_data=false
+# MAGIC %run ./_resources/00-init $catalog=cjc $db=chatbot $reset_all_data=false
 
 # COMMAND ----------
 
