@@ -574,5 +574,5 @@ def launch_embedding_model_proxy_endpoint(proxy_model_full_name, proxy_endpoint_
                                                     wait_start = True, 
                                                     environment_vars={"DATABRICKS_TOKEN": f"{{{{secrets/{sp_secret_scope}/{sp_secret_key}}}}}"})
         #Make sure all users can access our endpoint for this demo
-        set_model_endpoint_permission(proxy_endpoint_name, "CAN_MANAGE", "users")
+        # set_model_endpoint_permission(proxy_endpoint_name, "CAN_MANAGE", "users")
 

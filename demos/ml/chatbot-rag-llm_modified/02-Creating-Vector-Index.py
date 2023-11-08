@@ -22,6 +22,10 @@
 
 # COMMAND ----------
 
+print('')
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Document Embeddings 
 # MAGIC
@@ -117,7 +121,7 @@
 #init MLflow experiment
 import mlflow
 from mlflow import gateway
-init_experiment_for_batch("llm-chatbot-rag", "rag-model")
+init_experiment_for_batch("cjc-llm-chatbot-rag", "cjc-rag-model")
 
 gateway.set_gateway_uri(gateway_uri="databricks")
 #define our embedding route name, this is the endpoint we'll call for our embeddings
@@ -135,14 +139,10 @@ except:
             "name": "instructor-xl",
             "provider": "mosaicml",
             "mosaicml_config": {
-                "mosaicml_api_key": dbutils.secrets.get(scope="dbdemos", key="mosaic_ml_api_key")#Don't have a MosaicML Key ? Try with AzureOpenAI instead!
+                "mosaicml_api_key": dbutils.secrets.get(scope="cjc", key="mosaic_ml_api_key")#Don't have a MosaicML Key ? Try with AzureOpenAI instead!
             }
         }
     ))
-
-# COMMAND ----------
-
-
 
 # COMMAND ----------
 
@@ -177,12 +177,17 @@ print(r)
 
 # COMMAND ----------
 
+proxy_model_name="dbdemos_mosaic_ml_proxy"
+print(f"{catalog}.{db}.{proxy_model_name}")
+
+# COMMAND ----------
+
 # Name of the proxy model
 proxy_model_name="dbdemos_mosaic_ml_proxy"
 # Where the model will be saved in Unity Catalog
 proxy_model_full_name = f"{catalog}.{db}.{proxy_model_name}"
 # The model serving embedding endpoint name
-proxy_endpoint_name="dbdemos_embeddings_proxy"
+proxy_endpoint_name="cjc_dbdemos_embeddings_proxy"
 
 # Create the model, register it in UC and deploy the serverless endpoint.
 # The Service Principal (sp) secret is a PAT token used by the model serving endpoint to authenticate when quering the AI gateway.
@@ -241,7 +246,7 @@ wait_for_vs_endpoint_to_be_ready(vsc, vs_endpoint_name)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT * FROM databricks_documentation
+# MAGIC SELECT * FROM databricks_pdf_documentation
 
 # COMMAND ----------
 
@@ -253,15 +258,15 @@ wait_for_vs_endpoint_to_be_ready(vsc, vs_endpoint_name)
 # COMMAND ----------
 
 # MAGIC %sql 
-# MAGIC ALTER TABLE databricks_documentation SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
+# MAGIC ALTER TABLE databricks_pdf_documentation SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
 
 # COMMAND ----------
 
 # DBTITLE 1,Creating the index
 #The table we'd like to index
-source_table_fullname = f"{catalog}.{db}.databricks_documentation"
+source_table_fullname = f"{catalog}.{db}.databricks_pdf_documentation"
 #Where we want to store our index
-vs_index_fullname = f"{catalog}.{db}.databricks_documentation_vs_index"
+vs_index_fullname = f"{catalog}.{db}.databricks_pdf_documentation_vs_index"
 
 #if not index_exists(vs_index_fullname, vs_endpoint_name):
 print(f'Creating a vector search index `{vs_index_fullname}` against the table `{source_table_fullname}`, using the endpoint {vs_endpoint_name}')
@@ -293,6 +298,13 @@ if not index_exists(vsc, vs_index_fullname, vs_endpoint_name):
 # MAGIC Note that depending on your dataset size and model size, this can take several minutes.
 # MAGIC
 # MAGIC For more details, you can access the DLT pipeline from the link you get in the index definition.
+
+# COMMAND ----------
+
+# %sql 
+# SELECT * FROM event_log("0c2424b3-3f96-45fd-8660-8c1818a5e7b1")
+
+# Error in SQL statement: AnalysisException: [EVENT_LOG_REQUIRES_SHARED_COMPUTE] Cannot query event logs from an Assigned or No Isolation Shared cluster, please use a Shared cluster or a Databricks SQL warehouse instead.
 
 # COMMAND ----------
 
