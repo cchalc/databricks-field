@@ -187,3 +187,6 @@ dmypy.json
 # Databricks
 .databrickscfg
 .dbsqlclirc
+
+# general
+.readme.md
