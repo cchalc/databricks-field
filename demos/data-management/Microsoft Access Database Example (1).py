@@ -50,24 +50,22 @@
 
 # COMMAND ----------
 
-# MAGIC %python
-# MAGIC connectionProperties = {
-# MAGIC   "driver" : "net.ucanaccess.jdbc.UcanaccessDriver"
-# MAGIC }
-# MAGIC
-# MAGIC url = "jdbc:ucanaccess:///dbfs/FileStore/accessdb/olympicmedals.accdb"
-# MAGIC tables = spark.read.jdbc(url=url, table="information_schema.tables", properties=connectionProperties)
-# MAGIC
-# MAGIC display(df.filter(df.TABLE_SCHEMA=="PUBLIC"))
+connectionProperties = {
+  "driver" : "net.ucanaccess.jdbc.UcanaccessDriver"
+}
+
+url = "jdbc:ucanaccess:///dbfs/FileStore/accessdb/olympicmedals.accdb"
+tables = spark.read.jdbc(url=url, table="information_schema.tables", properties=connectionProperties)
+
+display(df.filter(df.TABLE_SCHEMA=="PUBLIC"))
 
 # COMMAND ----------
 
-# MAGIC %python
-# MAGIC connectionProperties = {
-# MAGIC   "driver" : "net.ucanaccess.jdbc.UcanaccessDriver"
-# MAGIC }
-# MAGIC
-# MAGIC url = "jdbc:ucanaccess:///dbfs/FileStore/accessdb/olympicmedals.accdb"
-# MAGIC df = spark.read.jdbc(url=url, table="MEDALS", properties=connectionProperties)
-# MAGIC
-# MAGIC display(df)
+connectionProperties = {
+  "driver" : "net.ucanaccess.jdbc.UcanaccessDriver"
+}
+
+url = "jdbc:ucanaccess:///dbfs/FileStore/accessdb/olympicmedals.accdb"
+df = spark.read.jdbc(url=url, table="MEDALS", properties=connectionProperties)
+
+display(df)
