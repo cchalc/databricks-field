@@ -1,0 +1,21 @@
+Requirement already satisfied: databricks-sdk in /databricks/python3/lib/python3.10/site-packages (0.1.6)
+Collecting databricks-sdk
+  Downloading databricks_sdk-0.20.0-py3-none-any.whl (452 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 453.0/453.0 kB 7.0 MB/s eta 0:00:00
+Requirement already satisfied: google-auth~=2.0 in /databricks/python3/lib/python3.10/site-packages (from databricks-sdk) (2.21.0)
+Requirement already satisfied: requests<3,>=2.28.1 in /databricks/python3/lib/python3.10/site-packages (from databricks-sdk) (2.28.1)
+Requirement already satisfied: six>=1.9.0 in /usr/lib/python3/dist-packages (from google-auth~=2.0->databricks-sdk) (1.16.0)
+Requirement already satisfied: cachetools<6.0,>=2.0.0 in /databricks/python3/lib/python3.10/site-packages (from google-auth~=2.0->databricks-sdk) (5.3.2)
+Requirement already satisfied: pyasn1-modules>=0.2.1 in /databricks/python3/lib/python3.10/site-packages (from google-auth~=2.0->databricks-sdk) (0.2.8)
+Requirement already satisfied: rsa<5,>=3.1.4 in /databricks/python3/lib/python3.10/site-packages (from google-auth~=2.0->databricks-sdk) (4.9)
+Requirement already satisfied: urllib3<2.0 in /databricks/python3/lib/python3.10/site-packages (from google-auth~=2.0->databricks-sdk) (1.26.14)
+Requirement already satisfied: charset-normalizer<3,>=2 in /databricks/python3/lib/python3.10/site-packages (from requests<3,>=2.28.1->databricks-sdk) (2.0.4)
+Requirement already satisfied: certifi>=2017.4.17 in /databricks/python3/lib/python3.10/site-packages (from requests<3,>=2.28.1->databricks-sdk) (2022.12.7)
+Requirement already satisfied: idna<4,>=2.5 in /databricks/python3/lib/python3.10/site-packages (from requests<3,>=2.28.1->databricks-sdk) (3.4)
+Requirement already satisfied: pyasn1<0.5.0,>=0.4.6 in /databricks/python3/lib/python3.10/site-packages (from pyasn1-modules>=0.2.1->google-auth~=2.0->databricks-sdk) (0.4.8)
+Installing collected packages: databricks-sdk
+  Attempting uninstall: databricks-sdk
+    Found existing installation: databricks-sdk 0.1.6
+    Not uninstalling databricks-sdk at /databricks/python3/lib/python3.10/site-packages, outside environment /local_disk0/.ephemeral_nfs/envs/pythonEnv-f9febe2d-9efd-4c27-8e83-e49ee167917a
+    Can't uninstall 'databricks-sdk'. No files were found to uninstall.
+Successfully installed databricks-sdk-0.20.0
