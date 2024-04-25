@@ -142,7 +142,7 @@ print(f"Prompt template: {PROMPT_TEMPLATE}")
 # COMMAND ----------
 
 # notebook_login()
-login(token="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")
+login(token="<token>")
 
 # COMMAND ----------
 
