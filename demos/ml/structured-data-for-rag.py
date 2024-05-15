@@ -17,6 +17,10 @@
 # MAGIC %pip install --force-reinstall databricks-feature-store 
 # MAGIC %pip install --force-reinstall databricks_vectorsearch 
 # MAGIC %pip install --force-reinstall -v langchain openai
+# MAGIC %pip install databricks-sdk --upgrade
+# MAGIC %pip install mlflow>=2.9.0
+# MAGIC
+# MAGIC dbutils.library.restartPython()
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -46,12 +50,13 @@ fe = feature_engineering.FeatureEngineeringClient()
 # If necessary, change the catalog and schema name here.
 username = spark.sql("SELECT current_user()").first()["current_user()"]
 username = username.split(".")[0]
-catalog_name = username
+# catalog_name = username
+catalog_name = "cjc"
 
 # Fetch the username to use as the schema name.
 schema_name = "rag"
 
-spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
+#spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
 spark.sql(f"USE CATALOG {catalog_name}")
 spark.sql(f"CREATE DATABASE IF NOT EXISTS {catalog_name}.{schema_name}")
 spark.sql(f"USE SCHEMA {schema_name}")
@@ -63,6 +68,7 @@ spark.sql(f"USE SCHEMA {schema_name}")
 
 # COMMAND ----------
 
+# DBTITLE 1,Create the tables
 user_preference_feature_table = f"{catalog_name}.{schema_name}.user_preferences"
 
 spark.sql(f"""
@@ -85,6 +91,10 @@ CREATE TABLE IF NOT EXISTS {hotel_prices_feature_table} (
     CONSTRAINT hotels_pk PRIMARY KEY(hotel_id)
 ) TBLPROPERTIES (delta.enableChangeDataFeed = true);
 """)
+
+# COMMAND ----------
+
+# DBTITLE 1,Create the Function
 
 hotel_price_function_name = f"{catalog_name}.{schema_name}.hotel_total_price"
 
@@ -167,9 +177,10 @@ fe.write_table(name=hotel_prices_feature_table, df=df)
 
 from databricks.vector_search.client import VectorSearchClient
 
-vsc = VectorSearchClient()
+vsc = VectorSearchClient(disable_notice=True)
 
-vector_search_endpoint_name = "rag_endpoint"
+# vector_search_endpoint_name = "rag_endpoint"
+vector_search_endpoint_name = "one-env-shared-endpoint-8"
 
 try:
     vsc.create_endpoint(vector_search_endpoint_name)
@@ -184,39 +195,26 @@ vsc.list_indexes(vector_search_endpoint_name)
 
 # COMMAND ----------
 
-def vector_index_ready(vsc, endpoint_name, index_name, desired_state_prefix="ONLINE"):
-    index = vsc.get_index(endpoint_name=endpoint_name, index_name=index_name).describe()
-    status = index["status"]["detailed_state"]
-    return desired_state_prefix in status
+current_table = "user_preferences"
+tmp_table = "tmp"
 
-
-def vector_index_exists(vsc, endpoint_name, index_name):
-    try:
-        vsc.get_index(endpoint_name=endpoint_name, index_name=index_name).describe()
-        return True
-    except Exception as e:
-        if "DOES_NOT_EXIST" in str(e) or "NOT_FOUND" in str(e):
-            return False
-        else:
-            raise e
-
-def wait_for_vector_index_ready(vsc, endpoint_name, index_name, max_wait_time=2400, desired_state_prefix="ONLINE"):
-    wait_interval = 60
-    max_wait_intervals = int(max_wait_time / wait_interval)
-    for i in range(0, max_wait_intervals):
-        time.sleep(wait_interval)
-        if vector_index_ready(vsc, endpoint_name, index_name, desired_state_prefix):
-            print(f"Vector search index '{index_name}' is ready.")
-            return
-        else:
-            print(
-                f"Waiting for vector search index '{index_name}' to be in ready state."
-            )
-    raise Exception(f"Vector index '{index_name}' is not ready after {max_wait_time} seconds.")
+spark.sql(f"CREATE TABLE IF NOT EXISTS {tmp_table} AS SELECT * FROM {catalog_name}.{schema_name}.{current_table}")
 
 # COMMAND ----------
 
 # MAGIC %md ### Calculate embedding using Databricks foundational model 
+
+# COMMAND ----------
+
+# def calculate_embedding(text):
+#     from databricks_genai_inference import Embedding
+
+#     response = Embedding.create(
+#         model="bge-large-en",
+#         input=text
+#     )
+    
+#     return response.embeddings
 
 # COMMAND ----------
 
@@ -263,7 +261,7 @@ schema = StructType([
     StructField("embedding", ArrayType(DoubleType()), False)
 ])
 
-# Create some dummy embeddings
+# Create some dummy embeddings (calculated instead of managed)
 data = [('AB123', calculate_embedding("ocean view, beautiful architecture, beautiful beaches")),
         ('SW345', calculate_embedding("city views, nice restaurants")),
         ('MJ564', calculate_embedding("beach facing, private beach")),
@@ -274,6 +272,36 @@ df = spark.createDataFrame(data, schema=schema)
 
 # Create the feature table that holds the embeddings of the hotel characteristics
 fe.write_table(name=hotels_table, df=df)
+
+# COMMAND ----------
+
+def index_exists(vsc, endpoint_name, index_full_name):
+    try:
+        dict_vsindex = vsc.get_index(endpoint_name, index_full_name).describe()
+        return dict_vsindex.get('status').get('ready', False)
+    except Exception as e:
+        if 'RESOURCE_DOES_NOT_EXIST' not in str(e):
+            print(f'Unexpected error describing the index. This could be a permission issue.')
+            raise e
+    return False
+    
+def wait_for_index_to_be_ready(vsc, vs_endpoint_name, index_name):
+  for i in range(180):
+    idx = vsc.get_index(vs_endpoint_name, index_name).describe()
+    index_status = idx.get('status', idx.get('index_status', {}))
+    status = index_status.get('detailed_state', index_status.get('status', 'UNKNOWN')).upper()
+    url = index_status.get('index_url', index_status.get('url', 'UNKNOWN'))
+    if "ONLINE" in status:
+      return
+    if "UNKNOWN" in status:
+      print(f"Can't get the status - will assume index is ready {idx} - url: {url}")
+      return
+    elif "PROVISIONING" in status:
+      if i % 40 == 0: print(f"Waiting for index to be ready, this can take a few min... {index_status} - pipeline url:{url}")
+      time.sleep(10)
+    else:
+        raise Exception(f'''Error with the index - this shouldn't happen. DLT pipeline might have been killed.\n Please delete it and re-run the previous cell: vsc.delete_index("{index_name}, {vs_endpoint_name}") \nIndex details: {idx}''')
+  raise Exception(f"Timeout, your index isn't ready yet: {vsc.get_index(index_name, vs_endpoint_name)}")
 
 # COMMAND ----------
 
@@ -296,12 +324,13 @@ except Exception as e:
   else:
     raise e
 
-wait_for_vector_index_ready(vsc, vector_search_endpoint_name, hotels_table_index)
+wait_for_index_to_be_ready(vsc, vector_search_endpoint_name, hotels_table_index)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### Set up feature serving endpoint
+# MAGIC #### User Preferences
 # MAGIC
 
 # COMMAND ----------
@@ -330,6 +359,8 @@ features=[
 
 # Create feature spec with the lookup for features
 user_spec_name = f"{catalog_name}.{schema_name}.user_preferences_spec"
+
+# 
 try:
   fe.create_feature_spec(name=user_spec_name, features=features)
 except Exception as e:
@@ -337,18 +368,62 @@ except Exception as e:
     pass
   else:
     raise e
-  
-# Create endpoint for serving user budget preferences
-try:
-  status = fe.create_feature_serving_endpoint(
-    name=user_endpoint_name, 
-    config=EndpointCoreConfig(
-      served_entities=ServedEntity(
-        feature_spec_name=user_spec_name, 
-        workload_size="Small", 
-        scale_to_zero_enabled=True)
-      )
+
+# COMMAND ----------
+
+from pprint import pprint
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.catalog import *
+import mlflow
+from databricks.sdk.service.catalog import OnlineTableSpec, OnlineTableSpecTriggeredSchedulingPolicy
+from databricks.sdk.service.serving import EndpointCoreConfigInput, ServedEntityInput
+
+# COMMAND ----------
+
+# DBTITLE 1,Set up user_preferences online table
+ws = WorkspaceClient()
+
+online_table_name=f"{catalog_name}.{schema_name}.user_preferences_online"
+
+# Create an online table
+spec = OnlineTableSpec(
+    primary_key_columns = ["user_id"],
+    source_table_full_name =user_preference_feature_table,
+    run_triggered=OnlineTableSpecTriggeredSchedulingPolicy.from_dict({'triggered': 'true'}),
+    perform_full_copy=True
     )
+
+try:
+  online_table_pipeline = ws.online_tables.create(name=online_table_name, spec=spec)
+except Exception as e:
+  if "already exists" in str(e):
+    pass
+  else:
+    raise e
+
+pprint(ws.online_tables.get(online_table_name))
+
+# COMMAND ----------
+
+print(user_spec_name)
+
+# COMMAND ----------
+
+# Create endpoint for serving user budget preferences
+
+try:
+  status = ws.serving_endpoints.create_and_wait(
+    name=user_endpoint_name, 
+    config=EndpointCoreConfigInput(
+      served_entities=[
+        ServedEntityInput(
+          entity_name=user_spec_name, 
+          workload_size="Small", 
+          scale_to_zero_enabled=True
+        )
+      ]
+    )
+  )
 
   # Print endpoint creation status
   print(status)
@@ -357,6 +432,11 @@ except Exception as e:
     pass
   else:
     raise e
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Hotel Price
 
 # COMMAND ----------
 
@@ -389,18 +469,47 @@ except Exception as e:
   else:
     raise e
 
-# Create endpoint
-try: 
-  status = fe.create_feature_serving_endpoint(
+# COMMAND ----------
+
+ws = WorkspaceClient()
+
+online_table_name=f"{catalog_name}.{schema_name}.hotel_prices_online"
+
+# Create an online table
+spec = OnlineTableSpec(
+    primary_key_columns = ["hotel_id"],
+    source_table_full_name =hotel_prices_feature_table,
+    run_triggered=OnlineTableSpecTriggeredSchedulingPolicy.from_dict({'triggered': 'true'}),
+    perform_full_copy=True
+    )
+
+try:
+  online_table_pipeline = ws.online_tables.create(name=online_table_name, spec=spec)
+except Exception as e:
+  if "already exists" in str(e):
+    pass
+  else:
+    raise e
+
+pprint(ws.online_tables.get(online_table_name))
+
+# COMMAND ----------
+
+try:
+  status = ws.serving_endpoints.create_and_wait(
     name=hotel_endpoint_name, 
-    config = EndpointCoreConfig(
-      served_entities=ServedEntity(
-        feature_spec_name=hotel_spec_name, 
-        workload_size="Small", 
-        scale_to_zero_enabled=True
+    config=EndpointCoreConfigInput(
+      served_entities=[
+        ServedEntityInput(
+          entity_name=hotel_spec_name, 
+          workload_size="Small", 
+          scale_to_zero_enabled=True
         )
+      ]
     )
   )
+
+  # Print endpoint creation status
   print(status)
 except Exception as e:
   if "already exists" in str(e):
@@ -427,6 +536,17 @@ print(status)
 # MAGIC %md ### Define a tool to retreive customers and revenues
 # MAGIC
 # MAGIC The CustomerRetrievalTool queries the Feature & Function Serving endpoint to serve data from the Databricks online table, thus providing context data based on the user query to the LLM.
+
+# COMMAND ----------
+
+# MAGIC %pip install --force-reinstall databricks-feature-store 
+# MAGIC %pip install --force-reinstall databricks_vectorsearch 
+# MAGIC %pip install --force-reinstall -v langchain openai
+# MAGIC %pip install databricks-sdk --upgrade
+# MAGIC %pip install mlflow>=2.9.0
+# MAGIC
+# MAGIC dbutils.library.restartPython()
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -574,7 +694,7 @@ class TotalPriceTool(BaseTool):
 # This allows the notebook to communicate with the ChatGPT conversational model.
 # Alternately, you could configure your own LLM model and configure Langchain to refer to it.
 
-OPENAI_API_KEY = dbutils.secrets.get("feature-serving", "OPENAI_API_KEY") #replace this with your openAI API key
+OPENAI_API_KEY = dbutils.secrets.get("tokens", "canadaeh-openaikey") #replace this with your openAI API key
 
 # COMMAND ----------
 
