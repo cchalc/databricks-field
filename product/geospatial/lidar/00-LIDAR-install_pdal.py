@@ -52,4 +52,4 @@ sudo make install
 
 # COMMAND ----------
 
-# MAGIC %fs ls /home/stuart@databricks.com/init
+
