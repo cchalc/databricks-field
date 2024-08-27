@@ -244,7 +244,7 @@ else:
 
 # COMMAND ----------
 
-token_c= "eG94Yi03Mzc1NzcwODIyNzcxLTczNjkyODY3MTg3MjYtbEszSVFzT3kwanhHMFNVUjJlYmNPSUMy"
+token_c= "<token>"
 
 import base64
 slack_token = base64.b64decode(token_c).decode("utf-8")
@@ -439,7 +439,7 @@ import dbutils
 import requests
 
 CLIENT_ID = "5670bdd6-0210-4b3d-8eda-62558be712ce"
-CLIENT_SECRET = "dosef82b413c613730d113c61ead61573696"
+CLIENT_SECRET = "<secret>"
 
 url = "https://e2-demo-field-eng.cloud.databricks.com/oidc/v1/token"
 
