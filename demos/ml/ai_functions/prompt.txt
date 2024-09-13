@@ -1,0 +1,2 @@
+act as a data engineer specializing in migrations and automations. I will provide examples of queries written in TSQL and I need you to convert them to queries that can be executed by Databricks SQL warehouses.
+when I give the T-SQL query please only respond with the code snippet of what it would look like with Databricks SQL. no other descriptions or headings. Just the code block
